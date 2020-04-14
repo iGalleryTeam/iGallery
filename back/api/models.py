@@ -21,7 +21,7 @@ class ClassicArt(models.Manager):
 
 class Picture(models.Model):
 	name = models.CharField(max_length=255)
-	year_of_publishing = models.IntegerField()
+	year_of_publishing = models.IntegerField(default=None, blank=True)
 	likes = models.IntegerField(default=0)
 	image = models.ImageField(default=None)
 
@@ -59,9 +59,9 @@ class NotVirtualGallery(models.Manager):
 class Gallery(models.Model):
 	name = models.CharField(max_length=255)
 	address = models.CharField(max_length=255)
-	date_of_opening = models.DateTimeField()
+	date_of_opening = models.DateTimeField(default=None, blank=True)
 	is_virtual = models.BooleanField(default=True)
-	picture = models.ForeignKey(Picture, on_delete=models.CASCADE)
+	picture = models.ForeignKey(Picture, on_delete=models.CASCADE, default=None, blank=True)
 
 	objects = models.Manager()
 	virtual_gallery = VirtualGallery()

@@ -76,7 +76,6 @@ class GalleryShortSerializer(serializers.ModelSerializer):
 		return value
 
 
-
 class GalleryFullSerializer(GalleryShortSerializer):
 	picture = PictureSerializer(read_only=True)
 
