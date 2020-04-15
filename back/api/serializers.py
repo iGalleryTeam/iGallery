@@ -5,6 +5,7 @@ from models import Gallery, Picture
 class PictureSerializer(serializers.Serializer):
 	id = serializers.IntegerField(read_only=True)
 	name = serializers.CharField(required=True)
+	likes = serializers.IntegerField(read_only=True)
 
 	def create(self, validated_data):
 		picture = Picture(**validated_data)
@@ -20,13 +21,14 @@ class PictureSerializer(serializers.Serializer):
 class PictureModelSerializer(serializers.ModelSerializer):
 	id = serializers.IntegerField(read_only=True)
 	name = serializers.CharField(required=True)
+	likes = serializers.IntegerField(read_only=True)
 
 	class Meta:
 		model = Picture
 		fields = '__all__'
 
 	def validate_name(self, value):
-		if['/', '^', '$', '%', '`'] in value:
+		if any(x in value for x in ['%', '&', '$', '^']):
 			raise serializers.ValidationError('invalid character in name field')
 		return value
 
@@ -63,14 +65,14 @@ class GalleryShortSerializer(serializers.ModelSerializer):
 
 	class Meta:
 		model = Gallery
-		fields = ('id', 'name', 'address', 'date_of_opening', 'is_virtual', 'picture_id')
+		fields = ('id', 'name', 'address', 'year_of_opening', 'is_virtual', 'picture_id')
 
 	def validate_name(self, value):
-		if['/', '^', '$', '%'] in value:
+		if any(x in value for x in ['%', '&', '$', '^']):
 			raise serializers.ValidationError('invalid character in name field')
 		return value
 
-	def validate_date_of_opening(self, value):
+	def validate_year_of_opening(self, value):
 		if value < 0:
 			raise serializers.ValidationError('invalid date type')
 		return value

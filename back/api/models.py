@@ -59,7 +59,7 @@ class NotVirtualGallery(models.Manager):
 class Gallery(models.Model):
 	name = models.CharField(max_length=255)
 	address = models.CharField(max_length=255)
-	date_of_opening = models.DateTimeField(default=None, blank=True)
+	year_of_opening = models.IntegerField(default=None)
 	is_virtual = models.BooleanField(default=True)
 	picture = models.ForeignKey(Picture, on_delete=models.CASCADE, default=None, blank=True)
 
@@ -74,14 +74,6 @@ class Gallery(models.Model):
 	def __str__(self):
 		return '{}: {}'.format(self.id, self.name)
 
-	def to_json(self):
-		return {
-			"id": self.id,
-			"name": self.name,
-			"address": self.address,
-			"date_of_opening": self.date_of_opening,
-			"picture": self.picture,
-			"is_virtual": self.is_virtual
-		}
+
 
 
