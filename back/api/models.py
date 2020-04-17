@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.db import models
+from utils.validators import validate_file_size, validate_extension
+
 
 # Create your models here.
 
@@ -23,7 +25,9 @@ class Picture(models.Model):
 	name = models.CharField(max_length=255)
 	year_of_publishing = models.IntegerField(default=None, blank=True)
 	likes = models.IntegerField(default=0)
-	image = models.ImageField(default=None)
+	image = models.ImageField(upload_to='pictures', validators=[validate_file_size,
+																validate_extension],
+							  									default=None, null=True, blank=True)
 
 	objects = models.Manager()
 	created_by_user = CreatedByUser()
@@ -73,7 +77,3 @@ class Gallery(models.Model):
 
 	def __str__(self):
 		return '{}: {}'.format(self.id, self.name)
-
-
-
-
