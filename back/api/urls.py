@@ -1,4 +1,4 @@
-from views.viewsets import *
+from api.views.viewsets import *
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()

@@ -6,6 +6,34 @@ from utils.validators import validate_file_size, validate_extension
 # Create your models here.
 
 
+class VirtualGallery(models.Manager):
+	def get_queryset(self):
+		return self.filter(is_virtual=True)
+
+
+class NotVirtualGallery(models.Manager):
+	def get_queryset(self):
+		return self.filter(is_virtual=False)
+
+
+class Gallery(models.Model):
+	name = models.CharField(max_length=255)
+	address = models.CharField(max_length=255)
+	year_of_opening = models.IntegerField(default=None)
+	is_virtual = models.BooleanField(default=None)
+
+	objects = models.Manager()
+	virtual_gallery = VirtualGallery()
+	not_virtual_gallery = NotVirtualGallery()
+
+	class Meta:
+		verbose_name = 'Gallery'
+		verbose_name_plural = 'Galleries'
+
+	def __str__(self):
+		return '{}: {}'.format(self.id, self.name)
+
+
 class CreatedByUser(models.Manager):
 	def for_user(self, user):
 		return self.filter(created_by=user)
@@ -23,16 +51,16 @@ class ClassicArt(models.Manager):
 
 class Picture(models.Model):
 	name = models.CharField(max_length=255)
-	year_of_publishing = models.IntegerField(default=None, blank=True)
+	year_of_publishing = models.IntegerField(default=None, blank=True, null=True)
 	likes = models.IntegerField(default=0)
 	image = models.ImageField(upload_to='pictures', validators=[validate_file_size,
 																validate_extension],
 							  									default=None, null=True, blank=True)
+	gallery = models.ForeignKey(Gallery, on_delete=models.CASCADE, default=None, null=True, blank=True,
+								related_name='pictures')
 
 	objects = models.Manager()
 	created_by_user = CreatedByUser()
-	modern_art = ModernArt()
-	classic_art = ClassicArt()
 
 	class Meta:
 		verbose_name = 'Picture'
@@ -50,30 +78,5 @@ class Picture(models.Model):
 		}
 
 
-class VirtualGallery(models.Manager):
-	def get_queryset(self):
-		return self.filter(is_virtual=True)
 
 
-class NotVirtualGallery(models.Manager):
-	def get_queryset(self):
-		return self.filter(is_virtual=False)
-
-
-class Gallery(models.Model):
-	name = models.CharField(max_length=255)
-	address = models.CharField(max_length=255)
-	year_of_opening = models.IntegerField(default=None)
-	is_virtual = models.BooleanField(default=True)
-	picture = models.ForeignKey(Picture, on_delete=models.CASCADE, default=None, blank=True)
-
-	objects = models.Manager()
-	virtual_gallery = VirtualGallery()
-	not_virtual_gallery = NotVirtualGallery()
-
-	class Meta:
-		verbose_name = 'Gallery'
-		verbose_name_plural = 'Galleries'
-
-	def __str__(self):
-		return '{}: {}'.format(self.id, self.name)

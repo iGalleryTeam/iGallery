@@ -1,5 +1,5 @@
 from api.models import Picture, Gallery
-from api.serializers import PictureSerializer, GalleryShortSerializer
+from api.serializers import PictureSerializer, GalleryModelSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -8,11 +8,11 @@ from rest_framework import status
 class GalleryList(APIView):
 	def get(self, request):
 		galleries = Gallery.objects.all()
-		serializer = GalleryShortSerializer(galleries, many=True)
+		serializer = GalleryModelSerializer(galleries, many=True)
 		return Response(serializer.data, status=status.HTTP_200_OK)
 
 	def post(self, request):
-		serializer = GalleryShortSerializer(data=request.data)
+		serializer = GalleryModelSerializer(data=request.data)
 		if serializer.is_valid():
 			serializer.save()
 			return Response(serializer.data, status=status.HTTP_201_CREATED)

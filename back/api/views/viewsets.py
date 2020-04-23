@@ -3,7 +3,7 @@ from rest_framework import generics, mixins
 from rest_framework.permissions import IsAuthenticated
 
 from api.models import Picture, Gallery
-from api.serializers import PictureModelSerializer, GalleryShortSerializer, GalleryFullSerializer
+from api.serializers import PictureShortSerializer, PictureFullSerializer, GalleryModelSerializer
 
 from django.shortcuts import get_object_or_404
 
@@ -31,22 +31,20 @@ class GalleryListViewSet(mixins.ListModelMixin,
 		else:
 			return Gallery.objects.all()
 
-	def get_serializer_class(self):
-		if self.action == 'list':
-			return GalleryShortSerializer
-		if self.action == 'retrieve':
-			return GalleryFullSerializer
-		return GalleryShortSerializer
+	serializer_class = GalleryModelSerializer
 
 	def perform_create(self, serializer):
 		serializer.save()
-		if self.action == 'create':
-			logger.debug('Gallery object created: {}'.format(serializer.instance))
-		elif self.action == 'update':
-			logger.debug('Gallery object updated: {}'.format(serializer.instance))
-		elif self.action == 'destroy':
-			logger.debug('Gallery object deleted: {}'.format(serializer.instance))
+		logger.debug('Gallery is created: {}'.format(serializer.instance))
+		logger.info('Gallery is created: {}'.format(serializer.instance))
 
+	def perform_update(self, serializer):
+		logger.debug('Gallery is updated, ID: {}'.format(serializer.instance))
+		logger.info('Gallery is updated, ID: {}'.format(serializer.instance))
+		logger.warning('Gallery is updated, ID: {}'.format(serializer.instance))
+
+	def perform_destroy(self, instance):
+		logger.warning('Gallery is deleted, ID: {}'.format(instance))
 
 
 
@@ -57,13 +55,23 @@ class PictureListViewSet(mixins.ListModelMixin,
 						 mixins.DestroyModelMixin,
 						 viewsets.GenericViewSet):
 	queryset = Picture.objects.all()
-	serializer_class = PictureModelSerializer
+
+	def get_serializer_class(self):
+		if self.action == 'list':
+			return PictureShortSerializer
+		if self.action == 'retrieve':
+			return PictureFullSerializer
+		return PictureShortSerializer
 
 	def perform_create(self, serializer):
 		serializer.save()
-		if self.action == 'create':
-			logger.debug('Picture object created: {}'.format(serializer.instance))
-		if self.action == 'update':
-			logger.debug('Picture object updated: {}'.format(serializer.instance))
-		if self.action == 'destroy':
-			logger.debug('Picture object deleted: {}'.format(serializer.instance))
+		logger.debug('Picture is created: {}'.format(serializer.instance))
+		logger.info('Picture is created: {}'.format(serializer.instance))
+
+	def perform_update(self, serializer):
+		logger.debug('Picture is updated, ID: {}'.format(serializer.instance))
+		logger.info('Picture is updated, ID: {}'.format(serializer.instance))
+		logger.warning('Picture is updated, ID: {}'.format(serializer.instance))
+
+	def perform_destroy(self, instance):
+		logger.warning('Picture is deleted, ID: {}'.format(instance))

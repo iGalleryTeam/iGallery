@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from models import Gallery, Picture
+from api.models import Gallery, Picture
 
 
 class PictureSerializer(serializers.Serializer):
@@ -18,14 +18,31 @@ class PictureSerializer(serializers.Serializer):
 		return instance
 
 
-class PictureModelSerializer(serializers.ModelSerializer):
+class GallerySerializer(serializers.Serializer):
+	id = serializers.IntegerField(read_only=True)
+	name = serializers.CharField(required=True)
+
+	def create(self, validated_data):
+		gallery = Gallery(**validated_data)
+		gallery.save()
+		return gallery
+
+	def update(self, instance, validated_data):
+		instance.name = validated_data.get('name', instance.name)
+		instance.save()
+		return instance
+
+
+class PictureShortSerializer(serializers.ModelSerializer):
 	id = serializers.IntegerField(read_only=True)
 	name = serializers.CharField(required=True)
 	likes = serializers.IntegerField(read_only=True)
+	year_of_publishing = serializers.IntegerField()
+	gallery_id = serializers.IntegerField(write_only=True)
 
 	class Meta:
 		model = Picture
-		fields = '__all__'
+		fields = ('id', 'name', 'likes', 'gallery_id', 'year_of_publishing', 'image')
 
 	def validate_name(self, value):
 		if any(x in value for x in ['%', '&', '$', '^']):
@@ -43,29 +60,14 @@ class PictureModelSerializer(serializers.ModelSerializer):
 		return value
 
 
-class GallerySerializer(serializers.Serializer):
+class GalleryModelSerializer(serializers.ModelSerializer):
 	id = serializers.IntegerField(read_only=True)
 	name = serializers.CharField(required=True)
-
-	def create(self, validated_data):
-		gallery = Gallery(**validated_data)
-		gallery.save()
-		return gallery
-
-	def update(self, instance, validated_data):
-		instance.name = validated_data.get('name', instance.name)
-		instance.save()
-		return instance
-
-
-class GalleryShortSerializer(serializers.ModelSerializer):
-	id = serializers.IntegerField(read_only=True)
-	name = serializers.CharField(required=True)
-	picture_id = serializers.IntegerField(write_only=True)
+	pictures = PictureShortSerializer(many=True, read_only=True)
 
 	class Meta:
 		model = Gallery
-		fields = ('id', 'name', 'address', 'year_of_opening', 'is_virtual', 'picture_id')
+		fields = ('id', 'name', 'address', 'year_of_opening', 'is_virtual', 'pictures')
 
 	def validate_name(self, value):
 		if any(x in value for x in ['%', '&', '$', '^']):
@@ -78,10 +80,10 @@ class GalleryShortSerializer(serializers.ModelSerializer):
 		return value
 
 
-class GalleryFullSerializer(GalleryShortSerializer):
-	picture = PictureSerializer(read_only=True)
+class PictureFullSerializer(PictureShortSerializer):
+	gallery = GallerySerializer(read_only=True)
 
-	class Meta(GalleryShortSerializer.Meta):
-		fields = GalleryShortSerializer.Meta.fields + ('picture', )
+	class Meta(PictureShortSerializer.Meta):
+		fields = PictureShortSerializer.Meta.fields + ('gallery', )
 
 
