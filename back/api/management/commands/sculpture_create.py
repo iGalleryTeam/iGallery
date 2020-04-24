@@ -2,7 +2,7 @@ from django.core.management.base import BaseCommand
 from datetime import datetime
 import random
 
-from api.models import Gallery, Picture
+from api.models import Gallery, Sculpture
 
 
 def create_gallery(num=3):
@@ -13,16 +13,16 @@ def create_gallery(num=3):
 
 
 class Command(BaseCommand):
-    help = 'Create fake date for Picture table'
+    help = 'Create fake date for Sculpture table'
 
     def add_arguments(self, parser):
-        parser.add_argument('total', type=int, help='Number of pictures for creation')
+        parser.add_argument('total', type=int, help='Number of sculptures for creation')
 
-        parser.add_argument('-p', '--prefix', type=str, help='Prefix string for new pictures')
+        parser.add_argument('-p', '--prefix', type=str, help='Prefix string for new sculptures')
 
 
     def handle(self, *args, **kwargs):
-        # Picture.objects.all().delete()
+        # Sculpture.objects.all().delete()
 
         total = kwargs['total']
         prefix = kwargs.get('prefix')
@@ -34,5 +34,5 @@ class Command(BaseCommand):
 
         #self.stdout.write()
         for i in range(total):
-            p = Picture.objects.create(name=f'{prefix}_picture {i}')
-            self.stdout.write(f'Picture {p.id} created')
+            s = Sculpture.objects.create(name=f'{prefix}_sculpture {i}')
+            self.stdout.write(f'Sculpture {s.id} created')

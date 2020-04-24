@@ -1,6 +1,13 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
 
-# Register your models here.
+from auth_.models import Author
+
+
+@admin.register(Author)
+class MyUserAdmin(UserAdmin):
+    list_display = ('id', 'username', 'is_moderator')
+    fieldsets = (
+        (None, {'fields': ('username', 'password')}),
+    )
+    ordering = ('id',)

@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 from django.db import models
 from utils.validators import validate_file_size, validate_extension
-
+from auth_.models import Author
 
 # Create your models here.
 
@@ -18,9 +17,9 @@ class NotVirtualGallery(models.Manager):
 
 class Gallery(models.Model):
 	name = models.CharField(max_length=255)
-	address = models.CharField(max_length=255)
-	year_of_opening = models.IntegerField(default=None)
-	is_virtual = models.BooleanField(default=None)
+	address = models.CharField(max_length=255, default=None, null=True, blank=True)
+	year_of_opening = models.IntegerField(default=None, null=True, blank=True)
+	is_virtual = models.BooleanField(default=None, null=True, blank=True)
 
 	objects = models.Manager()
 	virtual_gallery = VirtualGallery()
@@ -32,6 +31,16 @@ class Gallery(models.Model):
 
 	def __str__(self):
 		return '{}: {}'.format(self.id, self.name)
+
+
+class ArtObject(models.Model):
+	name = models.CharField(max_length=255)
+	year_of_publishing = models.IntegerField(default=None, blank=True, null=True)
+	created_by = models.ForeignKey(Author, on_delete=models.CASCADE, default=None, null=True, blank=True)
+	likes = models.IntegerField(default=0)
+
+	class Meta:
+		abstract = True
 
 
 class CreatedByUser(models.Manager):
@@ -49,13 +58,10 @@ class ClassicArt(models.Manager):
 		return self.filter__lte(year_of_publishing=2000)
 
 
-class Picture(models.Model):
-	name = models.CharField(max_length=255)
-	year_of_publishing = models.IntegerField(default=None, blank=True, null=True)
-	likes = models.IntegerField(default=0)
-	image = models.ImageField(upload_to='pictures', validators=[validate_file_size,
-																validate_extension],
-							  									default=None, null=True, blank=True)
+class Picture(ArtObject):
+	genre = models.CharField(max_length=255, default=None, null=True, blank=True)
+	image = models.ImageField(upload_to='pictures', validators=[validate_file_size, validate_extension],
+							  default=None, null=True, blank=True)
 	gallery = models.ForeignKey(Gallery, on_delete=models.CASCADE, default=None, null=True, blank=True,
 								related_name='pictures')
 
@@ -78,5 +84,16 @@ class Picture(models.Model):
 		}
 
 
+class Sculpture(ArtObject):
+	material = models.CharField(max_length=255, default=None, null=True, blank=True)
+	image = models.ImageField(upload_to='sculptures', validators=[validate_file_size, validate_extension],
+							  default=None, null=True, blank=True)
+	gallery = models.ForeignKey(Gallery, on_delete=models.CASCADE, default=None, null=True, blank=True,
+								related_name='sculptures')
 
+	class Meta:
+		verbose_name = 'Sculpture'
+		verbose_name_plural = 'Sculptures'
 
+	def __str__(self):
+		return '{}: {}'.format(self.id, self.name)
