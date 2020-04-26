@@ -123,13 +123,13 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
-    ),
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
+   'DEFAULT_PERMISSION_CLASSES': (
+       'rest_framework.permissions.IsAuthenticated',
+   ),
+   'DEFAULT_AUTHENTICATION_CLASSES': (
+       'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+       'rest_framework.authentication.SessionAuthentication',
+       'rest_framework.authentication.BasicAuthentication',
     ),
 }
 
@@ -173,7 +173,7 @@ LOGGING = {
     'disable_existing_loggers': False,
     'formatters': {
         'verbose': {
-            'format': '%(levelname)s -- %(asctime)s: %(message)s',
+            'format': '%(levelname)s [%(asctime)s]: %(message)s',
         },
         'simple': {
             'format': '%(levelname)s -- %(message)s'

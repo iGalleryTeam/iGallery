@@ -1,6 +1,17 @@
 from django.db import models
 
 from api.validators import validate_file_size, validate_extension
+from auth_.models import Author
+
+
+class VirtualGallery(models.Manager):
+    def get_queryset(self):
+        return self.filter(is_virtual=True)
+
+
+class NonVirtualGallery(models.Manager):
+    def get_queryset(self):
+        return self.filter(is_virtual=False)
 
 
 class CreatedByUser(models.Manager):
@@ -13,55 +24,67 @@ class ModernArt(models.Manager):
         return self.filter__gte(year_of_publishing=2000)
 
 
-class ClassicArt(models.Manager):
+class ClassicalArt(models.Manager):
     def get_queryset(self):
-        return self.filter__lte(year_of_publishing=2000)
-
-
-class Picture(models.Model):
-    name = models.CharField(max_length=255)
-    year_of_publishing = models.IntegerField(default=None, blank=True)
-    likes = models.IntegerField(default=0)
-    image = models.ImageField(upload_to='pictures', validators=[validate_file_size, validate_extension],
-                              default=None, null=True, blank=True)
-
-    objects = models.Manager()
-    created_by_user = CreatedByUser()
-    modern_art = ModernArt()
-    classic_art = ClassicArt()
-
-    class Meta:
-        verbose_name = 'Picture'
-        verbose_name_plural = 'Pictures'
-
-    def __str__(self):
-        return '{}: {}'.format(self.id, self.name)
-
-
-class VirtualGallery(models.Manager):
-    def get_queryset(self):
-        return self.filter(is_virtual=True)
-
-
-class NotVirtualGallery(models.Manager):
-    def get_queryset(self):
-        return self.filter(is_virtual=False)
+        return self.filter__lt(year_of_publishing=2000)
 
 
 class Gallery(models.Model):
     name = models.CharField(max_length=255)
-    address = models.CharField(max_length=255)
-    year_of_opening = models.IntegerField(default=None)
+    address = models.CharField(max_length=255, default='Paris')
+    opened = models.IntegerField(default=2020)
     is_virtual = models.BooleanField(default=True)
-    picture = models.ForeignKey(Picture, on_delete=models.CASCADE, default=None, blank=True)
 
     objects = models.Manager()
-    virtual_gallery = VirtualGallery()
-    not_virtual_gallery = NotVirtualGallery()
+    virtual_galleries = VirtualGallery()
+    non_virtual_galleries = NonVirtualGallery()
 
     class Meta:
         verbose_name = 'Gallery'
         verbose_name_plural = 'Galleries'
 
     def __str__(self):
-        return '{}: {}'.format(self.id, self.name)
+        return f'{self.id}: {self.name}'
+
+
+class ArtObject(models.Model):
+    name = models.CharField(max_length=255)
+    likes = models.IntegerField(default=0)
+    published = models.IntegerField(default=2020)
+    created_by = models.ForeignKey(Author, on_delete=models.CASCADE)
+
+    objects = models.Manager()
+    created_by_user = CreatedByUser()
+    modern_objects = ModernArt()
+    classical_objects = ClassicalArt()
+
+    class Meta:
+        abstract = True
+
+
+class Picture(ArtObject):
+    genre = models.CharField(max_length=255, default='Landscape')
+    image = models.ImageField(upload_to='pictures', validators=[validate_file_size, validate_extension],
+                              null=True, blank=True)
+    gallery = models.ForeignKey(Gallery, on_delete=models.CASCADE, related_name='pictures')
+
+    class Meta:
+        verbose_name = 'Picture'
+        verbose_name_plural = 'Pictures'
+
+    def __str__(self):
+        return f'{self.id}: {self.name}'
+
+
+class Sculpture(ArtObject):
+    material = models.CharField(max_length=255, default='Stone')
+    image = models.ImageField(upload_to='sculptures', validators=[validate_file_size, validate_extension],
+                              null=True, blank=True)
+    gallery = models.ForeignKey(Gallery, on_delete=models.CASCADE, related_name='sculptures')
+
+    class Meta:
+        verbose_name = 'Sculpture'
+        verbose_name_plural = 'Sculptures'
+
+    def __str__(self):
+        return f'{self.id}: {self.name}'

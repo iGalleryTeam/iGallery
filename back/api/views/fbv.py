@@ -1,8 +1,9 @@
-from api.models import Gallery, Picture
-from api.serializers import PictureSerializer, PictureModelSerializer, GalleryShortSerializer, GalleryFullSerializer
-from rest_framework.response import Response
-from rest_framework.decorators import api_view
 from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
+from api.models import Gallery, Picture
+from api.serializers import PictureSerializer, GalleryModelSerializer
 
 
 @api_view(['GET', 'POST'])
@@ -28,10 +29,10 @@ def picture_list(request, pk):
 def gallery_list(request):
     if request.method == 'GET':
         galleries = Gallery.objects.all()
-        serializer = GalleryShortSerializer(galleries, many=True)
+        serializer = GalleryModelSerializer(galleries, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     elif request.method == 'POST':
-        serializer = GalleryShortSerializer(data=request.data)
+        serializer = GalleryModelSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)

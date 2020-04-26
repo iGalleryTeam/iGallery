@@ -1,6 +1,8 @@
 from rest_framework import serializers
 
-from api.models import Gallery, Picture
+from api.models import Gallery, Picture, Sculpture
+from api.validators import validate_name, validate_likes, validate_published, validate_opened
+from auth_.serializers import AuthorSerializer
 
 
 class PictureSerializer(serializers.Serializer):
@@ -19,31 +21,6 @@ class PictureSerializer(serializers.Serializer):
         return instance
 
 
-class PictureModelSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(read_only=True)
-    name = serializers.CharField(required=True)
-    likes = serializers.IntegerField(read_only=True)
-
-    class Meta:
-        model = Picture
-        fields = '__all__'
-
-    def validate_name(self, value):
-        if any(x in value for x in ['%', '&', '$', '^']):
-            raise serializers.ValidationError('invalid character in name field')
-        return value
-
-    def validate_date_of_publishing(self, value):
-        if value < 0 or value > 2020:
-            raise serializers.ValidationError('invalid date_of_publishing of the picture')
-        return value
-
-    def validate_likes(self, value):
-        if value < 0:
-            raise serializers.ValidationError('invalid number of likes')
-        return value
-
-
 class GallerySerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     name = serializers.CharField(required=True)
@@ -59,28 +36,39 @@ class GallerySerializer(serializers.Serializer):
         return instance
 
 
-class GalleryShortSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(read_only=True)
-    name = serializers.CharField(required=True)
-    picture_id = serializers.IntegerField(write_only=True)
+class PictureShortSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(validators=[validate_name])
+    likes = serializers.IntegerField(read_only=True, validators=[validate_likes])
+    published = serializers.IntegerField(validators=[validate_published])
+
+    class Meta:
+        model = Picture
+        fields = ('id', 'name', 'genre', 'published', 'likes', 'image',)
+
+
+class SculptureShortSerializer(PictureShortSerializer):
+    class Meta(PictureShortSerializer.Meta):
+        model = Sculpture
+        fields = ('id', 'name', 'material', 'published', 'likes', 'image',)
+
+
+class GalleryModelSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(validators=[validate_name])
+    opened = serializers.IntegerField(validators=[validate_opened])
 
     class Meta:
         model = Gallery
-        fields = ('id', 'name', 'address', 'year_of_opening', 'is_virtual', 'picture_id')
-
-    def validate_name(self, value):
-        if any(x in value for x in ['%', '&', '$', '^']):
-            raise serializers.ValidationError('invalid character in name field')
-        return value
-
-    def validate_year_of_opening(self, value):
-        if value < 0:
-            raise serializers.ValidationError('invalid date type')
-        return value
+        fields = ('id', 'name', 'address', 'opened', 'is_virtual', 'pictures', 'sculptures')
 
 
-class GalleryFullSerializer(GalleryShortSerializer):
-    picture = PictureSerializer(read_only=True)
+class PictureFullSerializer(PictureShortSerializer):
+    gallery = GalleryModelSerializer(read_only=True)
+    created_by = AuthorSerializer(read_only=True)
 
-    class Meta(GalleryShortSerializer.Meta):
-        fields = GalleryShortSerializer.Meta.fields + ('picture',)
+    class Meta(PictureShortSerializer.Meta):
+        fields = PictureShortSerializer.Meta.fields + ('gallery', 'created_by',)
+
+
+class SculptureFullSerializer(PictureFullSerializer):
+    class Meta(SculptureShortSerializer.Meta):
+        fields = SculptureShortSerializer.Meta.fields + ('gallery', 'created_by',)
