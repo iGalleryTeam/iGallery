@@ -197,6 +197,10 @@ LOGGING = {
             'handlers': ['file_handler', 'console_handler'],
             'level': 'DEBUG',
         },
+        'auth_': {
+            'handlers': ['file_handler', 'console_handler'],
+            'level': 'DEBUG',
+        },
     },
 }
 

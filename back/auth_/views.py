@@ -1,4 +1,5 @@
 import json
+import logging
 
 from django.contrib import auth
 from django.http import JsonResponse
@@ -7,6 +8,8 @@ from rest_framework import generics, mixins, permissions, status
 
 from auth_.models import Author
 from auth_.serializers import AuthorSerializer
+
+logger = logging.getLogger(__name__)
 
 
 @csrf_exempt
@@ -20,14 +23,16 @@ def register(request):
     user.set_password(password)
     user.is_moderator = is_moderator
     user.save()
+    logger.info('Author with username {user.username} created')
 
-    return JsonResponse({'message': f'author with username {user.username} created'}, status=status.HTTP_201_CREATED)
+    return JsonResponse({'message': f'Author with username {user.username} created'}, status=status.HTTP_201_CREATED)
 
 
 @csrf_exempt
 def logout(request):
     user = auth.logout(request)
-    return JsonResponse({'message': 'logged out'}, status=status.HTTP_200_OK)
+    logger.info('Logged out')
+    return JsonResponse({'message': 'Logged out'}, status=status.HTTP_200_OK)
 
 
 class AuthorsListAPIView(mixins.ListModelMixin, generics.GenericAPIView):
