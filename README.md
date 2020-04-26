@@ -8,5 +8,9 @@
 
 ### What is iGallery?
 
+iGallery is a virtual Art Gallery in your laptop. You can visit Louvre and watch famous paintings of Leonardo da Vinci or   sculptures of Michelangelo. You can even share your own art work!
+All your favorite galleries in one place. 
+Enlighten yourself.
+
 ### Class Diagram
 ![Class Diagram](https://i.ibb.co/TPtCqT3/i-Gallery-Updated-2.png)
