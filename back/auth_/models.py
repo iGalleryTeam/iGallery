@@ -68,6 +68,5 @@ class Author(MyAbstractUser):
     is_moderator = models.BooleanField(default=False,
                                        help_text='Designates if the user can moderate the website')
 
-    def __str__(self):
-        moderator = 'moderator' if self.is_moderator else 'not moderator'
-        return f'{self.username}: {moderator}'
+
+
