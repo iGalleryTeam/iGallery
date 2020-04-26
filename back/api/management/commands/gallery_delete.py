@@ -1,6 +1,4 @@
 from django.core.management.base import BaseCommand
-from datetime import datetime
-import random
 
 from api.models import Gallery
 
@@ -12,7 +10,6 @@ class Command(BaseCommand):
         parser.add_argument('gallery_ids', nargs='+', help='Gallery ids for delete')
 
     def handle(self, *args, **kwargs):
-
         for gallery_id in kwargs['gallery_ids']:
             try:
                 g = Gallery.objects.get(id=gallery_id)
