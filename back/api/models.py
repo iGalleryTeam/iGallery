@@ -1,7 +1,6 @@
 from django.db import models
 from utils.validators import validate_file_size, validate_extension
 from auth_.models import Author
-
 # Create your models here.
 
 

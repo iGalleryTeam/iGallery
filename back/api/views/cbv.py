@@ -1,5 +1,5 @@
-from api.models import Picture, Gallery
-from api.serializers import PictureSerializer, GalleryModelSerializer
+from api.models import Picture, Gallery, Sculpture
+from api.serializers import PictureSerializer, GalleryModelSerializer, SculptureShortSerializer
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -27,6 +27,20 @@ class PictureList(APIView):
 
 	def post(self, request):
 		serializer = PictureSerializer(data=request.data)
+		if serializer.is_valid():
+			serializer.save()
+			return Response(serializer.data, status=status.HTTP_201_CREATED)
+		return Response(serializer.errors, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class SculptureList(APIView):
+	def get(self, request):
+		sculptures = Sculpture.objects.all()
+		serializer = SculptureShortSerializer(sculptures, many=True)
+		return Response(serializer.data, status=status.HTTP_200_OK)
+
+	def post(self, request):
+		serializer = SculptureShortSerializer(data=request.data)
 		if serializer.is_valid():
 			serializer.save()
 			return Response(serializer.data, status=status.HTTP_201_CREATED)

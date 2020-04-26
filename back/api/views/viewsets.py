@@ -12,12 +12,21 @@ logger = logging.getLogger(__name__)
 class GalleryViewSet(viewsets.ModelViewSet):
 	def get_queryset(self):
 		is_virtual = self.request.query_params.get('is_virtual', None)
+		if self.action == 'list':
+			if is_virtual is True:
+				return Gallery.virtual_gallery.prefetch_related('pictures')
+			elif is_virtual is False:
+				return Gallery.not_virtual_gallery.prefetch_related('pictures')
+		return Gallery.objects.all()
+
+	"""def get_queryset(self):
+		is_virtual = self.request.query_params.get('is_virtual', None)
 		if is_virtual is True:
 			return Gallery.virtual_gallery.all()
 		elif is_virtual is False:
 			return Gallery.not_virtual_gallery.all()
 		else:
-			return Gallery.objects.all()
+			return Gallery.objects.all()"""
 
 	serializer_class = GalleryModelSerializer
 
