@@ -17,7 +17,7 @@ class MyAbstractUser(AbstractBaseUser, PermissionsMixin):
         help_text=_('Required. 30 characters or fewer. Letters, digits and @/./+/-/_ only.'),
         validators=[username_validator],
         error_messages={
-            'unique': _("A user with that username already exists."),
+            'unique': _("Author with that username already exists."),
         },
     )
     first_name = models.CharField(_('first name'), max_length=30, blank=True)

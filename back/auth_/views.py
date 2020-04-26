@@ -18,10 +18,10 @@ def register(request):
 
     user = Author.objects.create_user(username=username)
     user.set_password(password)
-    user.is_super_man = is_moderator
+    user.is_moderator = is_moderator
     user.save()
 
-    return JsonResponse({'message': f'user with username {user.username} created'}, status=status.HTTP_201_CREATED)
+    return JsonResponse({'message': f'author with username {user.username} created'}, status=status.HTTP_201_CREATED)
 
 
 @csrf_exempt

@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from api.models import Gallery, Picture, Sculpture
 from api.validators import validate_name, validate_likes, validate_published, validate_opened
+from auth_.serializers import AuthorSerializer
 
 
 class PictureSerializer(serializers.Serializer):
@@ -39,23 +40,21 @@ class PictureShortSerializer(serializers.ModelSerializer):
     name = serializers.CharField(validators=[validate_name])
     likes = serializers.IntegerField(read_only=True, validators=[validate_likes])
     published = serializers.IntegerField(validators=[validate_published])
-    gallery_id = serializers.IntegerField(write_only=True)
 
     class Meta:
         model = Picture
-        fields = ('id', 'name', 'gallery_id', 'created_by',)
+        fields = ('id', 'name', 'genre', 'published', 'likes', 'image',)
 
 
 class SculptureShortSerializer(PictureShortSerializer):
     class Meta(PictureShortSerializer.Meta):
         model = Sculpture
+        fields = ('id', 'name', 'material', 'published', 'likes', 'image',)
 
 
 class GalleryModelSerializer(serializers.ModelSerializer):
     name = serializers.CharField(validators=[validate_name])
     opened = serializers.IntegerField(validators=[validate_opened])
-    pictures = PictureShortSerializer(many=True, read_only=True)
-    sculptures = SculptureShortSerializer(many=True, read_only=True)
 
     class Meta:
         model = Gallery
@@ -64,13 +63,12 @@ class GalleryModelSerializer(serializers.ModelSerializer):
 
 class PictureFullSerializer(PictureShortSerializer):
     gallery = GalleryModelSerializer(read_only=True)
+    created_by = AuthorSerializer(read_only=True)
 
     class Meta(PictureShortSerializer.Meta):
-        fields = PictureShortSerializer.Meta.fields + ('published', 'genre', 'likes', 'image', 'gallery',)
+        fields = PictureShortSerializer.Meta.fields + ('gallery', 'created_by',)
 
 
-class SculptureFullSerializer(SculptureShortSerializer):
-    gallery = GalleryModelSerializer(read_only=True)
-
+class SculptureFullSerializer(PictureFullSerializer):
     class Meta(SculptureShortSerializer.Meta):
-        fields = SculptureShortSerializer.Meta.fields + ('published', 'material', 'likes', 'image', 'gallery',)
+        fields = SculptureShortSerializer.Meta.fields + ('gallery', 'created_by',)
