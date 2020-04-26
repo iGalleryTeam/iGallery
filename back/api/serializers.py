@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from api.models import Gallery, Picture, Sculpture
+from api.models import Comment, Gallery, Picture, Sculpture
 from api.validators import validate_name, validate_likes, validate_published, validate_opened
 from auth_.serializers import AuthorSerializer
 
@@ -58,7 +58,7 @@ class GalleryModelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Gallery
-        fields = ('id', 'name', 'address', 'opened', 'is_virtual', 'pictures', 'sculptures')
+        fields = ('id', 'name', 'address', 'opened', 'is_virtual',)
 
 
 class PictureFullSerializer(PictureShortSerializer):
@@ -72,3 +72,23 @@ class PictureFullSerializer(PictureShortSerializer):
 class SculptureFullSerializer(PictureFullSerializer):
     class Meta(SculptureShortSerializer.Meta):
         fields = SculptureShortSerializer.Meta.fields + ('gallery', 'created_by',)
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    author = AuthorSerializer(read_only=True)
+    picture = PictureShortSerializer(read_only=True)
+
+    class Meta:
+        model = Comment
+        fields = ('text', 'picture', 'author',)
+
+
+class LikesSerializer(serializers.Serializer):
+    likes = serializers.IntegerField()
+
+    def create(self, validated_data):
+        pass
+
+    def update(self, instance, validated_data):
+        instance.like(validated_data.get('likes'))
+        return instance

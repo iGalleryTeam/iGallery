@@ -61,6 +61,17 @@ class ArtObject(models.Model):
     class Meta:
         abstract = True
 
+    def to_json(self):
+        return {
+            'name': self.name,
+            'published': self.published,
+            'likes': self.likes
+        }
+
+    def like(self, value):
+        self.likes += 1
+        self.save()
+
 
 class Picture(ArtObject):
     genre = models.CharField(max_length=255, default='Landscape')
@@ -88,3 +99,18 @@ class Sculpture(ArtObject):
 
     def __str__(self):
         return f'{self.id}: {self.name}'
+
+
+class Comment(models.Model):
+    text = models.TextField(max_length=300, default='')
+    author = models.ForeignKey(Author, on_delete=models.CASCADE, related_name='comments')
+    picture = models.ForeignKey(Picture, on_delete=models.CASCADE, related_name='comments')
+
+    objects = models.Manager()
+
+    class Meta:
+        verbose_name = 'Comment'
+        verbose_name_plural = 'Comments'
+
+    def __str__(self):
+        return f'{self.id}: {self.text[:20]}'
