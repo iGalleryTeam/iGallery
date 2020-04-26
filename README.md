@@ -9,4 +9,4 @@
 ### What is iGallery?
 
 ### Class Diagram
-![Class Diagram](https://ibb.co/9yWM3v5)
+![Class Diagram](https://i.ibb.co/TPtCqT3/i-Gallery-Updated-2.png)
