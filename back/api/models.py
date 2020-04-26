@@ -51,7 +51,7 @@ class ArtObject(models.Model):
     name = models.CharField(max_length=255)
     likes = models.IntegerField(default=0)
     published = models.IntegerField(default=2020)
-    created_by = models.ForeignKey(Author, on_delete=models.CASCADE)
+    created_by = models.ForeignKey(Author, on_delete=models.CASCADE, null=True, blank=True)
 
     objects = models.Manager()
     created_by_user = CreatedByUser()
