@@ -61,12 +61,23 @@ class ArtObject(models.Model):
     class Meta:
         abstract = True
 
+    def to_json(self):
+        return {
+            'name': self.name,
+            'published': self.published,
+            'likes': self.likes
+        }
+
+    def like(self, value):
+        self.likes += 1
+        self.save()
+
 
 class Picture(ArtObject):
     genre = models.CharField(max_length=255, default='Landscape')
     image = models.ImageField(upload_to='pictures', validators=[validate_file_size, validate_extension],
                               null=True, blank=True)
-    gallery = models.ForeignKey(Gallery, on_delete=models.CASCADE, related_name='pictures')
+    gallery = models.ForeignKey(Gallery, on_delete=models.CASCADE, related_name='pictures', null=True, blank=True)
 
     class Meta:
         verbose_name = 'Picture'
@@ -80,7 +91,7 @@ class Sculpture(ArtObject):
     material = models.CharField(max_length=255, default='Stone')
     image = models.ImageField(upload_to='sculptures', validators=[validate_file_size, validate_extension],
                               null=True, blank=True)
-    gallery = models.ForeignKey(Gallery, on_delete=models.CASCADE, related_name='sculptures')
+    gallery = models.ForeignKey(Gallery, on_delete=models.CASCADE, related_name='sculptures', null=True, blank=True)
 
     class Meta:
         verbose_name = 'Sculpture'
@@ -88,3 +99,18 @@ class Sculpture(ArtObject):
 
     def __str__(self):
         return f'{self.id}: {self.name}'
+
+
+class Comment(models.Model):
+    text = models.TextField(max_length=300, default='')
+    author = models.ForeignKey(Author, on_delete=models.CASCADE, related_name='comments', null=True, blank=True)
+    picture = models.ForeignKey(Picture, on_delete=models.CASCADE, related_name='comments', null=True, blank=True)
+
+    objects = models.Manager()
+
+    class Meta:
+        verbose_name = 'Comment'
+        verbose_name_plural = 'Comments'
+
+    def __str__(self):
+        return f'{self.id}: {self.text[:20]}'
