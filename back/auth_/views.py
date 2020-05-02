@@ -17,13 +17,15 @@ def register(request):
     body = json.loads(request.body.decode('utf-8'))
     username = body.get('username')
     password = body.get('password')
+    first_name = body.get('first_name')
     is_moderator = body.get('is_moderator')
 
     user = Author.objects.create_user(username=username)
     user.set_password(password)
+    user.first_name = first_name
     user.is_moderator = is_moderator
     user.save()
-    logger.info('Author with username {user.username} created')
+    logger.info(f'Author with username {user.username} created')
 
     return JsonResponse({'message': f'Author with username {user.username} created'}, status=status.HTTP_201_CREATED)
 

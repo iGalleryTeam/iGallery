@@ -6,6 +6,6 @@ from api.models import Gallery
 
 
 @receiver(post_save, sender=Author)
-def user_created(sender, instance, created, **kwargs):
+def author_created(sender, instance, created, **kwargs):
     if created:
         Gallery.objects.create(name='This is your first virtual gallery')

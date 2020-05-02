@@ -64,7 +64,7 @@ class PictureViewSet(viewsets.ModelViewSet):
         serializer = LikesSerializer(self.get_object(), data={'likes': 0})
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        logger.warning('Picture with id {} was liked'.format(pk))
+        logger.info('Picture with id {} was liked'.format(pk))
         return Response({'message': 'you liked it!'}, status=status.HTTP_200_OK)
 
 
@@ -101,7 +101,7 @@ class SculptureViewSet(viewsets.ModelViewSet):
         serializer = LikesSerializer(self.get_object(), data={'likes': 0})
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        logger.warning('Sculpture with id {} was liked'.format(pk))
+        logger.info('Sculpture with id {} was liked'.format(pk))
         return Response({'message': 'you liked it!'}, status=status.HTTP_200_OK)
 
 
